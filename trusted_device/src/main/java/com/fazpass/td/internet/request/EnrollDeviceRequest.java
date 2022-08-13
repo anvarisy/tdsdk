@@ -6,58 +6,215 @@ import java.util.List;
 
 public class EnrollDeviceRequest {
 
-    @SerializedName("public_key")
-    private String publicKey;
+    public EnrollDeviceRequest(String name, String email, String phone, String idCard, String address, String device, String packageName, boolean trusted, boolean useFingerPrint, boolean usePin, boolean useVpn, String notificationToken, String meta, String key, String timeZone, List<Contact> contacts, Location location, List<Sim> sims) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.idCard = idCard;
+        this.address = address;
+        this.device = device;
+        this.packageName = packageName;
+        this.trusted = trusted;
+        this.useFingerPrint = useFingerPrint;
+        this.usePin = usePin;
+        this.useVpn = useVpn;
+        this.notificationToken = notificationToken;
+        this.meta = meta;
+        this.key = key;
+        this.timeZone = timeZone;
+        this.contacts = contacts;
+        this.location = location;
+        this.sims = sims;
+    }
 
-    @SerializedName("pin")
-    private String pin;
-
-    @SerializedName("contact")
-    private List<Contact> contacts;
-
-    @SerializedName("sims")
-    private List<Sim> sims;
-
-
-}
-
-
-class Contact{
     @SerializedName("name")
     private String name;
-    @SerializedName("phone_number")
-    private List<String> phoneNumber;
 
-    public Contact(String name, List<String> phoneNumber) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-    }
+    @SerializedName("email")
+    private String email;
+
+    @SerializedName("phone")
+    private String phone;
+
+    @SerializedName("ktp")
+    private String idCard;
+
+    @SerializedName("address")
+    private String address;
+
+    @SerializedName("device")
+    private String device;
+
+    @SerializedName("app")
+    private String packageName;
+
+    @SerializedName("is_trusted")
+    private boolean trusted;
+
+    @SerializedName("use_fingerprint")
+    private boolean useFingerPrint;
+
+    @SerializedName("use_pin")
+    private boolean usePin;
+
+    @SerializedName("is_vpn")
+    private boolean useVpn;
+
+    @SerializedName("notification_token")
+    private String notificationToken;
+
+    @SerializedName("meta")
+    private String meta;
+
+    @SerializedName("key")
+    private String key;
+
+    @SerializedName("time_zone")
+    private String timeZone;
+
+    @SerializedName("contacts")
+    private List<Contact> contacts;
+
+    @SerializedName("location")
+    private Location location;
+
+    @SerializedName("sim")
+    private List<Sim> sims;
 
     public String getName() {
         return name;
     }
 
-    public List<String> getPhoneNumber() {
-        return phoneNumber;
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getIdCard() {
+        return idCard;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public boolean isTrusted() {
+        return trusted;
+    }
+
+    public boolean isUseFingerPrint() {
+        return useFingerPrint;
+    }
+
+    public boolean isUsePin() {
+        return usePin;
+    }
+
+    public boolean isUseVpn() {
+        return useVpn;
+    }
+
+    public String getNotificationToken() {
+        return notificationToken;
+    }
+
+    public String getMeta() {
+        return meta;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public List<Contact> getContacts() {
+        return contacts;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public List<Sim> getSims() {
+        return sims;
+    }
+
+    public static class Sim{
+        @SerializedName("serial")
+        private String serialNumber;
+        @SerializedName("phone")
+        private String phoneNumber;
+
+        public Sim(String serialNumber, String phoneNumber) {
+            this.serialNumber = serialNumber;
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getSerialNumber() {
+            return serialNumber;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+    }
+
+    public static class Contact {
+        @SerializedName("name")
+        private String name;
+        @SerializedName("phone")
+        private List<String> phoneNumber;
+
+        public Contact(String name, List<String> phoneNumber) {
+
+            this.name = name;
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<String> getPhoneNumber() {
+            return phoneNumber;
+        }
+    }
+
+    public static class Location {
+        @SerializedName("lat")
+        private double latitude;
+        @SerializedName("lng")
+        private double longitude;
+
+        public Location(double latitude, double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
     }
 }
 
-class Sim{
-    @SerializedName("serial_number")
-    private String serialNumber;
-    @SerializedName("phone_number")
-    private String phoneNumber;
 
-    public Sim(String serialNumber, String phoneNumber) {
-        this.serialNumber = serialNumber;
-        this.phoneNumber = phoneNumber;
-    }
 
-    public String getSerialNumber() {
-        return serialNumber;
-    }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-}

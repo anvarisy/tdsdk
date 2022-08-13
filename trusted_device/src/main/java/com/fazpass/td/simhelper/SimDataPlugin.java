@@ -1,30 +1,22 @@
 package com.fazpass.td.simhelper;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
-
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.fazpass.td.Fazpass;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
 
 public class SimDataPlugin {
     private Context applicationContext;
@@ -192,7 +184,6 @@ public class SimDataPlugin {
         });
       return sims;
     }
-
 
 
 }

@@ -3,7 +3,6 @@ package com.fazpass.td.internet;
 import com.fazpass.td.Merchant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -20,7 +19,6 @@ public class Roaming {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Merchant.baseUrl)
                 .client(client)

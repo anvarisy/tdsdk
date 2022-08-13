@@ -1,19 +1,20 @@
 package com.fazpass.td;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-
-import android.provider.Settings;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
-
+import org.json.JSONException;
+import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
+import java.util.UUID;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,61 +27,82 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Key {
-    private final String applicationId;
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
+
+class Key {
     private final Context context;
-    private final String keyStoreAlias;
-    private String publicKey;
-
-    public String getApplicationId() {
-        return applicationId;
-    }
-
-    public Key(Context context) {
+    private String keyStoreAlias;
+    private String userId;
+    private String meta;
+    private String pin;
+    private User user;
+    private Device device;
+    public Key(Context context, User user, Device device, String pin) {
         this.context = context;
-        this.applicationId = generateAppId();
-        this.keyStoreAlias = generateKeyStoreAlias();
+        this.pin = BCrypt.withDefaults().hashToString(12, pin.toCharArray());;
+        this.user = user;
+        this.device = device;
+        initialize();
     }
 
-    @SuppressLint("HardwareIds")
-    private String generateAppId(){
-        String appId = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        Storage.storeToLocal(context,Fazpass.APP_ID,appId);
-        return appId;
+    private void initialize(){
+        try{
+            userId = UUID.randomUUID().toString();
+            keyStoreAlias = generateKeyAlias(userId);
+            String password = BCrypt.withDefaults().hashToString(12, userId.toCharArray());
+            if(Storage.isDataExists(context,Fazpass.PRIVATE_KEY)){
+                Storage.removeDataLocal(context,Fazpass.PRIVATE_KEY);
+            }
+            Storage.storeToLocal(context,Fazpass.PRIVATE_KEY,password);
+            meta = Crypto.encrypt(keyStoreAlias,password);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    @NonNull
-    private String generateKeyStoreAlias(){
-        String alias = Merchant.merchantToken +","+context.getPackageName()+","+User.userId+","+User.emailOrMobile+","+generateAppId();
-        Storage.storeToLocal(context,Fazpass.KEY_ALIAS,alias);
-        return alias;
-    }
+    private String generateKeyAlias(String uuid){
+        JSONObject json = new JSONObject();
+        try{
+            json.put(Fazpass.MERCHANT_TOKEN,Merchant.merchantToken);
+            json.put(Fazpass.PACKAGE_NAME, context.getPackageName());
+            json.put(Fazpass.PUBLIC_KEY, uuid);
+            json.put(Fazpass.USER_PHONE, user.getPhone());
+            json.put(Fazpass.USER_EMAIL, user.getEmail());
+            json.put(Fazpass.USER_PIN, pin);
+            json.put(Fazpass.DEVICE, device.getDevice());
+            return json.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return json.toString();
+        }
 
-    static String generateKeyStoreAlias(String merchantToken, Context context, String userId, String userEmailPhone, String appId){
-        return merchantToken +","+context.getPackageName()+","+userId+","+userEmailPhone+","+appId;
     }
-
-    @SuppressLint("HardwareIds")
-    static String generateAppId(Context context){
-        return Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
+/*
     private SecretKey generateKey(int n) throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(Fazpass.AES);
         keyGenerator.init(n);
         SecretKey key = keyGenerator.generateKey();
-        String privateKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        Storage.storeToLocal(context,Fazpass.PRIVATE_KEY,privateKey);
         return key;
+    }
+
+    static SecretKey generatePrivetKey(String userId){
+        try{
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            // Before the keystore can be accessed, it must be loaded.
+            keyStore.load(null);
+            SecretKey privateKey = (SecretKey) keyStore.getKey(userId, null);
+            return privateKey;
+        }catch (Exception e){
+            return null;
+        }
+
     }
 
     @NonNull
     static IvParameterSpec generateIv(String uuid) {
-        if(uuid.length() < 16){
-            throw new ArrayIndexOutOfBoundsException();
-        }
-        String id = uuid.substring(0,16);
-        byte[] iv = id.getBytes(StandardCharsets.UTF_8);
+        byte[] iv = uuid.substring(0,16).getBytes(StandardCharsets.UTF_8);
         return new IvParameterSpec(iv);
     }
 
@@ -110,5 +132,16 @@ public class Key {
         byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(publicKey));
         return new String(plainText);
     }
+*/
+    public String getUserId() {
+        return userId;
+    }
 
+    public String getMeta() {
+        return meta;
+    }
+
+    public String getPin() {
+        return pin;
+    }
 }

@@ -1,5 +1,6 @@
 package com.fazpass.td;
 
 public interface EnrollDevice<T> {
-    void enrollDeviceResult(T result);
+    void enrollDeviceSuccess(T result);
+    void enrollDeviceFailure(Throwable err);
 }

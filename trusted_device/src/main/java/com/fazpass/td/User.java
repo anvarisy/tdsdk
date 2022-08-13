@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 public class User {
     public static String userId;
-    public static String emailOrMobile;
 
     private String email;
     private String phone;
@@ -13,8 +12,8 @@ public class User {
     private String address;
 
     public User(@NonNull String email, @NonNull String phone, @NonNull String name, @NonNull String idCard, @NonNull String address) {
-        if(email.equals("") || phone.equals("")){
-            throw new ExceptionInInitializerError("email or phone is required");
+        if(email.equals("") && phone.equals("")){
+            throw new NullPointerException("email or phone is required");
         }
         this.email = email;
         this.phone = phone;

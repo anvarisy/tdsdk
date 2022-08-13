@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class Helper {
+class Helper {
     JSONArray listContactToJson(@NonNull List<Contact> contacts){
         JSONArray jsonArray = new JSONArray();
         for(int i = 0; i< contacts.size(); i++){
@@ -44,19 +44,19 @@ public class Helper {
         return jsonArray;
     }
 
-    static int getStatusPhone(Context context, boolean status, int code){
+    static TD getStatusPhone(Context context, boolean status, int code){
         if(!status){
-            return TrustedDevice.USER_NOT_FOUND;
+            return TD.USER_NOT_FOUND;
         }else if(code == 2000211){
-            return TrustedDevice.KEY_SERVER_NOT_FOUND;
+            return TD.KEY_SERVER_NOT_FOUND;
         }else if(code==2000212){
-            return TrustedDevice.KEY_SERVER_NOT_FOUND;
+            return TD.KEY_SERVER_NOT_FOUND;
         }else{
             String key = Storage.readDataLocal(context, Fazpass.PRIVATE_KEY);
             if(key.equals("")){
-                return TrustedDevice.KEY_LOCALE_NOT_FOUND;
+                return TD.KEY_LOCALE_NOT_FOUND;
             }
-            return TrustedDevice.KEY_READY_TO_COMPARE;
+            return TD.KEY_READY_TO_COMPARE;
         }
 
     }

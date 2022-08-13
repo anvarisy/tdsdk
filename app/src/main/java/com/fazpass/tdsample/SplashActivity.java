@@ -26,7 +26,9 @@ public class SplashActivity extends AppCompatActivity {
                 .withPermissions(
                         Manifest.permission.READ_PHONE_STATE,
                         Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.READ_PHONE_NUMBERS
+                        Manifest.permission.READ_PHONE_NUMBERS,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
                 ).withListener(new MultiplePermissionsListener() {
                     @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
                         Intent intent = new Intent(SplashActivity.this,MainActivity.class);

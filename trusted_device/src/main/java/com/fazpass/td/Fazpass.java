@@ -1,13 +1,20 @@
 package com.fazpass.td;
 
-public class Fazpass {
+public abstract class Fazpass {
+    static final String MERCHANT_TOKEN = "merchant_token";
+    static final String PACKAGE_NAME = "package_name";
     static final String PRIVATE_KEY = "private_key";
+    static final String PUBLIC_KEY = "public_key";
+    static final String USER_EMAIL = "user_email";
+    static final String USER_PHONE = "user_phone";
+    static final String USER_PIN = "user_pin";
+    static final String DEVICE = "device";
+    static final String META = "meta";
+
     static final String KEY_ALIAS = "key_alias";
-    static final String DEVICE_META = "device_meta";
     static final String DEVICE_ROOTED = "device_rooted";
     static final String DEVICE_CONTACTS = "device_contact";
     static final String DEVICE_SIMS = "device_sims";
-    static final String APP_ID = "app_id";
     static final String TAG = "fazpass";
     static final String AES_CBC_PKCS_5_PADDING = "AES/CBC/PKCS5Padding";
     static final String AES = "AES";
