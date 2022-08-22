@@ -3,13 +3,11 @@ package com.fazpass.td;
 import androidx.annotation.NonNull;
 
 public class User {
-    public static String userId;
-
-    private String email;
-    private String phone;
-    private String name;
-    private String idCard;
-    private String address;
+    private final String email;
+    private final String phone;
+    private final String name;
+    private final String idCard;
+    private final String address;
 
     public User(@NonNull String email, @NonNull String phone, @NonNull String name, @NonNull String idCard, @NonNull String address) {
         if(email.equals("") && phone.equals("")){
@@ -41,4 +39,5 @@ public class User {
     public String getAddress() {
         return address;
     }
+
 }

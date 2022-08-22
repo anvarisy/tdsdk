@@ -59,20 +59,20 @@ public class CheckUserRequest {
 
     public static class Location {
         @SerializedName("lat")
-        private double latitude;
+        private String latitude;
         @SerializedName("lng")
-        private double longitude;
+        private String longitude;
 
         public Location(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
+            this.latitude = String.valueOf(latitude);
+            this.longitude = String.valueOf(longitude);
         }
 
-        public double getLatitude() {
+        public String getLatitude() {
             return latitude;
         }
 
-        public double getLongitude() {
+        public String getLongitude() {
             return longitude;
         }
     }

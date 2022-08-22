@@ -3,16 +3,9 @@ package com.fazpass.td;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 class Storage {
-    private Context context;
-
-    public Storage(Context context) {
-        this.context = context;
-    }
 
     static void storeToLocal(Context context, String key, String value){
         String password = Merchant.merchantToken;
@@ -31,14 +24,12 @@ class Storage {
     static void removeDataLocal(Context context, String key){
         String password = Merchant.merchantToken;
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
-        sharedPref.edit().remove(key);
+        sharedPref.edit().remove(key).apply();
+
     }
 
     static boolean isDataExists(Context context, String key){
-        if(readDataLocal(context,key).equals("")){
-            return false;
-        }
-        return true;
+        return !readDataLocal(context, key).equals("");
     }
      static String readDataPublic(@NonNull Context context, String packageName, String password, String key){
         try{

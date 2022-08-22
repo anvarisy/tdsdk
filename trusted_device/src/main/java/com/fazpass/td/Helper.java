@@ -44,19 +44,19 @@ class Helper {
         return jsonArray;
     }
 
-    static TD getStatusPhone(Context context, boolean status, int code){
+    static TD_STATUS getStatusPhone(Context context, boolean status, int code){
         if(!status){
-            return TD.USER_NOT_FOUND;
+            return TD_STATUS.USER_NOT_FOUND;
         }else if(code == 2000211){
-            return TD.KEY_SERVER_NOT_FOUND;
+            return TD_STATUS.KEY_SERVER_NOT_FOUND;
         }else if(code==2000212){
-            return TD.KEY_SERVER_NOT_FOUND;
+            return TD_STATUS.KEY_SERVER_NOT_FOUND;
         }else{
             String key = Storage.readDataLocal(context, Fazpass.PRIVATE_KEY);
             if(key.equals("")){
-                return TD.KEY_LOCALE_NOT_FOUND;
+                return TD_STATUS.KEY_LOCALE_NOT_FOUND;
             }
-            return TD.KEY_READY_TO_COMPARE;
+            return TD_STATUS.KEY_READY_TO_COMPARE;
         }
 
     }

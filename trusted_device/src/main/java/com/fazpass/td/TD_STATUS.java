@@ -1,6 +1,6 @@
 package com.fazpass.td;
 
-public enum TD {
+public enum TD_STATUS {
     KEY_LOCALE_NOT_FOUND,
     KEY_SERVER_NOT_FOUND,
     KEY_READY_TO_COMPARE,

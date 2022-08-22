@@ -15,4 +15,7 @@ public interface UseCase {
     @POST("/enroll")
     Observable<Response<EnrollDeviceResponse>> enrollDevice(@Header("Authorization")String token, @Body EnrollDeviceRequest body);
 
+    @POST("/validate")
+    Observable<Response<ValidateDeviceResponse>> validateDevice(@Header("Authorization")String token, @Body ValidateDeviceRequest body);
+
 }

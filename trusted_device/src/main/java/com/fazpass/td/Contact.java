@@ -21,9 +21,7 @@ public class Contact {
     private List<Contact> contacts;
     public Contact(Context context) {
         this.context = context;
-        readContacts().subscribe(c->{
-           this.contacts = c; 
-        });
+        readContacts().subscribe(c-> this.contacts = c);
     }
 
     private Contact(String name, List<String> number){

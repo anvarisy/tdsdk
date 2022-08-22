@@ -7,7 +7,7 @@ import android.net.NetworkCapabilities;
 
 class Connection {
     private boolean useVpn;
-    private Context context;
+    private final Context context;
     public boolean isUseVpn() {
         return useVpn;
     }
