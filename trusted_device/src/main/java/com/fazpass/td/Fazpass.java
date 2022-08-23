@@ -13,10 +13,12 @@ public abstract class Fazpass {
     static final String USER_PIN = "user_pin";
     static final String USER_ID = "user_id";
     static final String DEVICE = "device";
+    static final String META = "meta";
     static final String TAG = "fazpass";
 
-/*    static final String META = "meta";
-    static final String IV = "iv";
+    static final String LOCAL_MISSING = "LOCAL DATA IS MISSING";
+    static final String PIN_NOT_MATCH = "COMPARING PIN IS FAILED";
+/*  static final String IV = "iv";
     static final String FINGER_PASSWORD = "finger_password";
     static final String KEY_ALIAS = "key_alias";
     static final String DEVICE_ROOTED = "device_rooted";

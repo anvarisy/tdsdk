@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ValidateDeviceRequest {
 
-    public ValidateDeviceRequest(String userId, String device, String packageName, String meta, String key, String timeZone, List<EnrollDeviceRequest.Contact> contacts, EnrollDeviceRequest.Location location, List<EnrollDeviceRequest.Sim> sims) {
+    public ValidateDeviceRequest(String userId, String device, String packageName, String meta, String key, String timeZone, List<Contact> contacts, Location location, List<Sim> sims) {
         this.userId = userId;
         this.device = device;
         this.packageName = packageName;
@@ -30,20 +30,20 @@ public class ValidateDeviceRequest {
     @SerializedName("meta")
     private String meta;
 
-    @SerializedName("key")
-    private String key;
-
     @SerializedName("time_zone")
     private String timeZone;
 
+    @SerializedName("key")
+    private String key;
+
     @SerializedName("contacts")
-    private List<EnrollDeviceRequest.Contact> contacts;
+    private List<Contact> contacts;
 
     @SerializedName("location")
-    private EnrollDeviceRequest.Location location;
+    private Location location;
 
     @SerializedName("sim")
-    private List<EnrollDeviceRequest.Sim> sims;
+    private List<Sim> sims;
 
     public static class Sim{
         @SerializedName("serial")
@@ -121,24 +121,24 @@ public class ValidateDeviceRequest {
     public String getMeta() {
         return meta;
     }
-
-    public String getKey() {
-        return key;
-    }
-
+    
     public String getTimeZone() {
         return timeZone;
     }
 
-    public List<EnrollDeviceRequest.Contact> getContacts() {
+    public List<Contact> getContacts() {
         return contacts;
     }
 
-    public EnrollDeviceRequest.Location getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public List<EnrollDeviceRequest.Sim> getSims() {
+    public List<Sim> getSims() {
         return sims;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 
 class Storage {
 
-    static void storeToLocal(Context context, String key, String value){
+    private static void saveData(Context context, String key, String value){
         String password = Merchant.merchantToken;
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -21,14 +21,21 @@ class Storage {
         return sharedPref.getString(key,"");
     }
 
-    static void removeDataLocal(Context context, String key){
+    private static void removeDataLocal(Context context, String key){
         String password = Merchant.merchantToken;
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
         sharedPref.edit().remove(key).apply();
 
     }
 
-    static boolean isDataExists(Context context, String key){
+    static void storeDataLocal(Context context, String key, String newValue){
+        if(isDataExists(context,key)){
+            removeDataLocal(context,key);
+        }
+        saveData(context,key,newValue);
+    }
+
+    private static boolean isDataExists(Context context, String key){
         return !readDataLocal(context, key).equals("");
     }
      static String readDataPublic(@NonNull Context context, String packageName, String password, String key){
