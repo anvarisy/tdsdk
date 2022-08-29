@@ -29,12 +29,12 @@ class FazpassKey {
     private void initialize(){
         try{
             userId = UUID.randomUUID().toString();
-            Storage.storeDataLocal(context,Fazpass.PUBLIC_KEY, userId);
+            Storage.storeDataLocal(context, TD.PUBLIC_KEY, userId);
             String keyStoreAlias = generateKeyAlias(userId);
             String password = BCrypt.withDefaults().hashToString(12, userId.toCharArray());
-            Storage.storeDataLocal(context,Fazpass.PRIVATE_KEY,password);
+            Storage.storeDataLocal(context, TD.PRIVATE_KEY,password);
             meta = Crypto.encrypt(keyStoreAlias,password);
-            Storage.storeDataLocal(context,Fazpass.META,meta);
+            Storage.storeDataLocal(context, TD.META,meta);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,13 +44,13 @@ class FazpassKey {
     private String generateKeyAlias(String uuid){
         JSONObject json = new JSONObject();
         try{
-            json.put(Fazpass.MERCHANT_TOKEN,Merchant.merchantToken);
-            json.put(Fazpass.PACKAGE_NAME, context.getPackageName());
-            json.put(Fazpass.PUBLIC_KEY, uuid);
-            json.put(Fazpass.USER_PHONE, user.getPhone());
-            json.put(Fazpass.USER_EMAIL, user.getEmail());
-            json.put(Fazpass.USER_PIN, pin);
-            json.put(Fazpass.DEVICE, device.getDevice());
+            json.put(TD.MERCHANT_TOKEN,Merchant.merchantToken);
+            json.put(TD.PACKAGE_NAME, context.getPackageName());
+            json.put(TD.PUBLIC_KEY, uuid);
+            json.put(TD.USER_PHONE, user.getPhone());
+            json.put(TD.USER_EMAIL, user.getEmail());
+            json.put(TD.USER_PIN, pin);
+            json.put(TD.DEVICE, device.getDevice());
             return json.toString();
         } catch (JSONException e) {
             e.printStackTrace();

@@ -31,11 +31,21 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class TrustedDevice {
-    private Context context;
-    private TD_STATUS status;
+public abstract class TrustedDevice {
+    public Context ctx;
+    public TD_STATUS status;
 
-    public TrustedDevice(Context context, String merchantToken, String packageName, TD_MODE mode){
+    public abstract Observable<TrustedDevice> check(String email, String phone);
+
+    public abstract void enrollDeviceByPin(User user, @NonNull String pin, TrustedDeviceListener<EnrollStatus> enroll);
+
+    public abstract void enrollDeviceByFinger(User user, String pin, TrustedDeviceListener<EnrollStatus> enroll);
+
+    public abstract void validateUserByFinger(TrustedDeviceListener<ValidateStatus> listener);
+
+    public abstract void validateUserByPin(String pin, TrustedDeviceListener<ValidateStatus> listener);
+
+  /*  public TrustedDevice(Context context, String merchantToken, String packageName, TD_MODE mode){
         Device device = new Device(context);
         if (!context.getPackageName().equals(packageName)){
             Log.e(Fazpass.TAG, String.format("your current package is %s that not match with %s",
@@ -313,5 +323,5 @@ public class TrustedDevice {
         ValidateDeviceRequest body = new ValidateDeviceRequest(userId, device.getDevice(), context.getPackageName(),
                 meta, key, geo.getTimezone(), contactBody, locationBody, simBody);
         return body;
-    }
+    }*/
 }

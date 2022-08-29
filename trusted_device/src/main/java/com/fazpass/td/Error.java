@@ -3,10 +3,10 @@ package com.fazpass.td;
 public class Error {
 
     public static NullPointerException localDataMissing(){
-        return new NullPointerException(Fazpass.LOCAL_MISSING);
+        return new NullPointerException(TD.LOCAL_MISSING);
     }
 
     public static SecurityException pinNotMatch(){
-        return new SecurityException(Fazpass.PIN_NOT_MATCH);
+        return new SecurityException(TD.PIN_NOT_MATCH);
     }
 }

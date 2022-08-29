@@ -18,4 +18,10 @@ public interface UseCase {
     @POST("/validate")
     Observable<Response<ValidateDeviceResponse>> validateDevice(@Header("Authorization")String token, @Body ValidateDeviceRequest body);
 
+    @POST("/remove")
+    Observable<Response<RemoveDeviceResponse>> removeDevice(@Header("Authorization")String token, @Body RemoveDeviceRequest body);
+
+    @POST("/recover")
+    Observable<Response<RecoverAccountResponse>> recoverDevice(@Header("Authorization")String token, @Body RecoverAccountRequest body);
+
 }
