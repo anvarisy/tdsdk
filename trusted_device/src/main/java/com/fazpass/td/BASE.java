@@ -1,6 +1,10 @@
 package com.fazpass.td;
 
-abstract class TD extends TrustedDevice {
+import android.content.Context;
+
+public abstract class BASE{
+    public Context ctx;
+    public TD_STATUS status;
     static final String DEBUG = "";
     static final String STAGING = "";
     static final String PRODUCTION = "";

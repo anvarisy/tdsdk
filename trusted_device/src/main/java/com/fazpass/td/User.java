@@ -8,7 +8,7 @@ public class User {
     private final String name;
     private final String idCard;
     private final String address;
-
+    private static boolean useFinger;
     public User(@NonNull String email, @NonNull String phone, @NonNull String name, @NonNull String idCard, @NonNull String address) {
         if(email.equals("") && phone.equals("")){
             throw new NullPointerException("email or phone is required");
@@ -40,4 +40,11 @@ public class User {
         return address;
     }
 
+    public static boolean isUseFinger() {
+        return useFinger;
+    }
+
+    public static void setIsUseFinger(boolean isUseFinger) {
+        User.useFinger = isUseFinger;
+    }
 }

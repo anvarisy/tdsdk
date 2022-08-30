@@ -52,7 +52,7 @@ class Helper {
         }else if(code==2000212){
             return TD_STATUS.KEY_SERVER_NOT_FOUND;
         }else{
-            String key = Storage.readDataLocal(context, TD.PRIVATE_KEY);
+            String key = Storage.readDataLocal(context, BASE.PRIVATE_KEY);
             if(key.equals("")){
                 return TD_STATUS.KEY_LOCALE_NOT_FOUND;
             }

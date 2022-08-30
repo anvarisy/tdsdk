@@ -1,6 +1,5 @@
 package com.fazpass.td;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -32,17 +31,12 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class Fazpass extends TD{
+public class Fazpass extends TrustedDevice implements Behaviour {
 
 
-    public static TrustedDevice initialize(Context context, String merchantToken, String packageName, TD_MODE mode){
+    public static TrustedDevice initialize(Context context, String merchantToken, TD_MODE mode){
         Device device = new Device(context);
-        if (!context.getPackageName().equals(packageName)){
-            Log.e(TD.TAG, String.format("your current package is %s that not match with %s",
-                    context.getPackageName(),packageName));
-            throw new SecurityException("package name not match");
-        }
-        else if (merchantToken == null || merchantToken.equals("")){
+        if (merchantToken == null || merchantToken.equals("")){
             throw new NullPointerException("merchant id cannot be null or empty");
         }else if (device.isRooted() || device.isEmulator()){
             throw new SecurityException("Device rooted or is an emulator");
@@ -81,14 +75,14 @@ public class Fazpass extends TD{
                         json.getString(Fazpass.DEVICE).equals(device.getDevice())){
                     status = TD_STATUS.KEY_IS_MATCH;
                     Storage.storeDataLocal(context,Fazpass.USER_ID, resp.getUser().getId());
+                    User.setIsUseFinger(resp.getApps().getCurrent().isUse_fingerprint());
                     //TODO update last active
                 }else{
                     status = TD_STATUS.KEY_NOT_MATCH;
                 }
 
             } catch (JSONException e) {
-                Log.e("TD",e.getMessage());
-                e.printStackTrace();
+                Log.e(TAG,e.getMessage());
                 status = TD_STATUS.KEY_NOT_MATCH;
             }
         }
@@ -96,7 +90,7 @@ public class Fazpass extends TD{
     }
 
     @Override
-    public Observable<TrustedDevice> check(String email, String phone) {
+    public Observable<Fazpass> check(String email, String phone) {
         String packageName = ctx.getPackageName();
         Device device = new Device(ctx);
         GeoLocation location = new GeoLocation(ctx);
@@ -158,7 +152,15 @@ public class Fazpass extends TD{
     }
 
     @Override
-    public void validateUserByFinger(TrustedDeviceListener<ValidateStatus> listener) {
+    public void validateUser(String pin, TrustedDeviceListener<ValidateStatus> listener) {
+        if(User.isUseFinger()){
+            validateUserByFinger(listener);
+        }else{
+            validateUserByPin(pin, listener);
+        }
+    }
+
+    private void validateUserByFinger(TrustedDeviceListener<ValidateStatus> listener) {
         openBiometric(new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
@@ -194,8 +196,7 @@ public class Fazpass extends TD{
         });
     }
 
-    @Override
-    public void validateUserByPin(String pin, TrustedDeviceListener<ValidateStatus> listener) {
+    private void validateUserByPin(String pin, TrustedDeviceListener<ValidateStatus> listener) {
         String meta = Storage.readDataLocal(ctx,Fazpass.META);
         String key = Storage.readDataLocal(ctx,Fazpass.PRIVATE_KEY);
         if(meta.equals("")||key.equals("")){
