@@ -5,8 +5,8 @@ import android.content.Context;
 public abstract class BASE{
     public Context ctx;
     public TD_STATUS status;
-    static final String DEBUG = "";
-    static final String STAGING = "";
+    static final String DEBUG = "http://localhost:8080/";
+    static final String STAGING = "https://channa.fazpas.com/";
     static final String PRODUCTION = "";
     static final String MERCHANT_TOKEN = "merchant_token";
     static final String PACKAGE_NAME = "package_name";

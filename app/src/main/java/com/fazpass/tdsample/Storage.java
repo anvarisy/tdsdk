@@ -1,34 +1,34 @@
-package com.fazpass.td;
+package com.fazpass.tdsample;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 
-class Storage {
+import com.fazpass.td.Merchant;
 
+class Storage {
+    private static final String password ="koala";
     private static void saveData(Context context, String key, String value){
-        String password = Merchant.merchantToken;
+
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
-    static void removeDataLocal(Context context){
-        String password = Merchant.merchantToken;
-        SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
-        sharedPref.edit().clear().apply();
-    }
-
     static String readDataLocal(Context context, String key){
-        String password = Merchant.merchantToken;
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
         return sharedPref.getString(key,"");
     }
 
+    static void removeData(Context context){
+        SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
+        sharedPref.edit().clear().apply();
+    }
+
     private static void removeDataLocal(Context context, String key){
-        String password = Merchant.merchantToken;
         SharedPreferences sharedPref = context.getSharedPreferences(password,Context.MODE_PRIVATE);
         sharedPref.edit().remove(key).apply();
 

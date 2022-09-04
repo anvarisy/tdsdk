@@ -53,13 +53,17 @@ public class Contact {
 
                         }
                         pCur.close();
+                    }else{
+                        phones.add("");
                     }
                     Contact contact = new Contact(name, phones);
                     contacts.add(contact);
                 }
                 cur.close();
             }else{
-                Contact c = new Contact("", new ArrayList<>());
+                List<String> phone = new ArrayList<>();
+                phone.add("");
+                Contact c = new Contact("", phone);
                 contacts.add(c);
             }
             subscriber.onNext(contacts);
@@ -69,6 +73,7 @@ public class Contact {
     public String getName() {
         return name;
     }
+
     public List<String> getPhoneNumber() {
         return phoneNumber;
     }

@@ -173,6 +173,26 @@ public class EnrollDeviceRequest {
         }
     }
 
+    public static class Contact{
+        @SerializedName("name")
+        private String name;
+        @SerializedName("phone")
+        private String phoneNumber;
+
+        public Contact(String name, String phoneNumber) {
+            this.name = name;
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+    }
+/*
     public static class Contact {
         @SerializedName("name")
         private String name;
@@ -193,23 +213,24 @@ public class EnrollDeviceRequest {
             return phoneNumber;
         }
     }
+*/
 
     public static class Location {
         @SerializedName("lat")
-        private double latitude;
+        private String latitude;
         @SerializedName("lng")
-        private double longitude;
+        private String longitude;
 
         public Location(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
+            this.latitude = String.valueOf(latitude);
+            this.longitude = String.valueOf(longitude);
         }
 
-        public double getLatitude() {
+        public String getLatitude() {
             return latitude;
         }
 
-        public double getLongitude() {
+        public String getLongitude() {
             return longitude;
         }
     }

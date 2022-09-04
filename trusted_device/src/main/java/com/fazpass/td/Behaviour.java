@@ -8,4 +8,6 @@ public interface Behaviour {
    void enrollDeviceByFinger(User user, String pin, TrustedDeviceListener<EnrollStatus> enroll);
 
    void validateUser(String pin, TrustedDeviceListener<ValidateStatus> listener);
+
+   void removeDevice(TrustedDeviceListener<RemoveStatus> listener);
 }

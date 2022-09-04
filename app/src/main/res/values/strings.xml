@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">td sample</string>
+    <string name="detail_app">WELCOME TO FAZPASS</string>
+    <string name="welcome">WELCOME BACK TO FAZPASS</string>
+    <string name="home_app">HOMEPAGE OF FAZPASS</string>
+    <string name="register">LET\'S JOIN WITH US</string>
+    <string name="forgot_account"><u>Forgot your account</u></string>
+    <string name="url"><u>https://fazpass.com</u></string>
 </resources>

@@ -21,7 +21,7 @@ class GeoLocation extends Service implements LocationListener {
     private double latitude = 0.0;
     private double longitude = 0.0;
     private String timezone;
-    private Context context;
+    private final Context context;
     boolean isGPSEnabled = false;
     boolean isNetworkEnabled = false;
     boolean canGetLocation = false;

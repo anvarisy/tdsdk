@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ValidateDeviceRequest {
 
+
     public ValidateDeviceRequest(String userId, String device, String packageName, String meta, String key, String timeZone, List<Contact> contacts, Location location, List<Sim> sims) {
         this.userId = userId;
         this.device = device;
@@ -64,7 +65,26 @@ public class ValidateDeviceRequest {
             return phoneNumber;
         }
     }
+    public static class Contact{
+        @SerializedName("name")
+        private String name;
+        @SerializedName("phone")
+        private String phoneNumber;
 
+        public Contact(String name, String phoneNumber) {
+            this.name = name;
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+    }
+/*
     public static class Contact {
         @SerializedName("name")
         private String name;
@@ -85,6 +105,7 @@ public class ValidateDeviceRequest {
             return phoneNumber;
         }
     }
+*/
 
     public static class Location {
         @SerializedName("lat")

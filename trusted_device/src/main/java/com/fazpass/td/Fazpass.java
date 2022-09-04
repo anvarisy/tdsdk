@@ -13,9 +13,11 @@ import com.fazpass.td.internet.Roaming;
 import com.fazpass.td.internet.UseCase;
 import com.fazpass.td.internet.request.CheckUserRequest;
 import com.fazpass.td.internet.request.EnrollDeviceRequest;
+import com.fazpass.td.internet.request.RemoveDeviceRequest;
 import com.fazpass.td.internet.request.ValidateDeviceRequest;
 import com.fazpass.td.internet.response.CheckUserResponse;
 import com.fazpass.td.internet.response.EnrollDeviceResponse;
+import com.fazpass.td.internet.response.RemoveDeviceResponse;
 import com.fazpass.td.internet.response.ValidateDeviceResponse;
 
 import org.json.JSONException;
@@ -50,6 +52,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
                 break;
             case PRODUCTION:
                 Merchant.baseUrl = Fazpass.PRODUCTION;
+                break;
         }
         Merchant.merchantToken = merchantToken;
         return new Fazpass(context);
@@ -60,9 +63,11 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     }
 
     private Fazpass(Context context, TD_STATUS st, CheckUserResponse resp){
+        String key = Storage.readDataLocal(context, BASE.PRIVATE_KEY);
         if(!Objects.equals(st, TD_STATUS.KEY_READY_TO_COMPARE)){
-            Log.e("TD","FAILED TO COMPARE");
             status = st;
+        }else if (key.equals("")){
+            status = TD_STATUS.KEY_LOCALE_NOT_FOUND;
         }else{
             Device device = new Device(context);
             String password = Storage.readDataLocal(context,Fazpass.PRIVATE_KEY);
@@ -80,9 +85,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
                 }else{
                     status = TD_STATUS.KEY_NOT_MATCH;
                 }
-
             } catch (JSONException e) {
-                Log.e(TAG,e.getMessage());
                 status = TD_STATUS.KEY_NOT_MATCH;
             }
         }
@@ -90,7 +93,10 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     }
 
     @Override
-    public Observable<Fazpass> check(String email, String phone) {
+    public Observable<Fazpass> check(@NonNull String email, @NonNull String phone) {
+        if(email.equals("") && phone.equals("")){
+            throw new NullPointerException("email or phone cannot be empty");
+        }
         String packageName = ctx.getPackageName();
         Device device = new Device(ctx);
         GeoLocation location = new GeoLocation(ctx);
@@ -98,34 +104,34 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         CheckUserRequest body = new CheckUserRequest(email,phone, packageName,device.getDevice(), location.getTimezone(),locationDetail);
         return Observable.create(subscriber->{
             UseCase u = Roaming.start();
-            u.startService(Merchant.merchantToken,body)
+            u.startService("Bearer "+Merchant.merchantToken,body)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             resp->{
                                 subscriber.onNext(new Fazpass(ctx,
-                                        Helper.getStatusPhone(ctx,resp.getStatus(),resp.getCode()),
+                                        Helper.getStatusPhone(resp),
                                         resp.getData()));
                                 subscriber.onComplete();
-                            },err->{
-                                subscriber.onError(err);
-                                Log.e(Fazpass.TAG,err.getMessage());
-                            }
+                            }, subscriber::onError
                     );
         });
     }
 
     @Override
     public void enrollDeviceByPin(User user, @NonNull String pin, TrustedDeviceListener<EnrollStatus> enroll) {
+        if(pin.equals("")){
+            throw new NullPointerException("PIN cannot be null or empty");
+        }
         EnrollDeviceRequest request = collectDataEnroll(user,pin, false);
-        enroll(request).subscribe(resp-> enroll.onSuccess(new EnrollStatus(resp.getStatus(),resp.getMessage())), err->{
-            Log.e(Fazpass.TAG,err.getMessage());
-            enroll.onFailure(err);
-        });
+        enroll(request).subscribe(resp-> enroll.onSuccess(new EnrollStatus(resp.getStatus(),resp.getMessage())), enroll::onFailure);
     }
 
     @Override
     public void enrollDeviceByFinger(User user, String pin, TrustedDeviceListener<EnrollStatus> enroll) {
+        if(pin.equals("")){
+            throw new NullPointerException("PIN cannot be null or empty");
+        }
         openBiometric(new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
@@ -137,10 +143,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 EnrollDeviceRequest request = collectDataEnroll(user, pin, true);
-                enroll(request).subscribe(resp-> enroll.onSuccess(new EnrollStatus(resp.getStatus(), resp.getMessage())), err->{
-                    Log.e(Fazpass.TAG,err.getMessage());
-                    enroll.onFailure(err);
-                });
+                enroll(request).subscribe(resp-> enroll.onSuccess(new EnrollStatus(resp.getStatus(), resp.getMessage())), enroll::onFailure);
             }
 
             @Override
@@ -160,6 +163,14 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         }
     }
 
+    @Override
+    public void removeDevice(TrustedDeviceListener<RemoveStatus> listener) {
+        remove(collectDataRemove()).subscribe(resp->{
+           listener.onSuccess(new RemoveStatus(resp.getStatus(),resp.getMessage()));
+           Storage.removeDataLocal(ctx);
+        }, listener::onFailure);
+    }
+
     private void validateUserByFinger(TrustedDeviceListener<ValidateStatus> listener) {
         openBiometric(new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -171,7 +182,12 @@ public class Fazpass extends TrustedDevice implements Behaviour {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                ValidateDeviceRequest body = collectDataValidate(listener);
+                ValidateDeviceRequest body = collectDataValidate();
+                assert body != null;
+                if(body.getKey().equals("")){
+                    listener.onFailure(Error.localDataMissing());
+                    return;
+                }
                 validate(body).subscribe(resp->{
                     ValidateStatus.Confidence cfd = new ValidateStatus.Confidence(
                             resp.getData().getMeta(),
@@ -197,10 +213,14 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     }
 
     private void validateUserByPin(String pin, TrustedDeviceListener<ValidateStatus> listener) {
+        if(pin.equals("")){
+            throw new NullPointerException("PIN cannot be null or empty");
+        }
         String meta = Storage.readDataLocal(ctx,Fazpass.META);
         String key = Storage.readDataLocal(ctx,Fazpass.PRIVATE_KEY);
         if(meta.equals("")||key.equals("")){
             listener.onFailure(Error.localDataMissing());
+            return;
         }
         String rawData = Crypto.decrypt(meta,key);
         try{
@@ -208,7 +228,12 @@ public class Fazpass extends TrustedDevice implements Behaviour {
             String cryptPin = json.getString(Fazpass.USER_PIN);
             BCrypt.Result result = BCrypt.verifyer().verify(pin.toCharArray(), cryptPin);
             if(result.verified){
-                ValidateDeviceRequest body = collectDataValidate(listener);
+                ValidateDeviceRequest body = collectDataValidate();
+                assert body != null;
+                if(body.getKey().equals("")){
+                    listener.onFailure(Error.localDataMissing());
+                    return;
+                }
                 validate(body).subscribe(resp->{
                     ValidateStatus.Confidence cfd = new ValidateStatus.Confidence(
                             resp.getData().getMeta(),
@@ -235,7 +260,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         Executor executor = ContextCompat.getMainExecutor(ctx);
         BiometricPrompt biometricPrompt = new BiometricPrompt((FragmentActivity) ctx, executor,listener);
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Biometric required")
+                .setTitle("Biometric Required")
                 .setSubtitle("")
                 .setNegativeButtonText("Cancel")
                 .build();
@@ -245,7 +270,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     private Observable<Response<EnrollDeviceResponse>> enroll(EnrollDeviceRequest body){
         return Observable.create(subscriber->{
             UseCase u = Roaming.start();
-            u.enrollDevice(Merchant.merchantToken,body)
+            u.enrollDevice("Bearer "+Merchant.merchantToken,body)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(resp->{
@@ -258,7 +283,20 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     private Observable<Response<ValidateDeviceResponse>> validate(ValidateDeviceRequest body){
         return Observable.create(subscriber->{
             UseCase u = Roaming.start();
-            u.validateDevice(Merchant.merchantToken,body)
+            u.validateDevice("Bearer "+Merchant.merchantToken,body)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(resp->{
+                        subscriber.onNext(resp);
+                        subscriber.onComplete();
+                    }, subscriber::onError);
+        });
+    }
+
+    private Observable<Response<RemoveDeviceResponse>> remove(RemoveDeviceRequest body){
+        return Observable.create(subscriber->{
+            UseCase u = Roaming.start();
+            u.removeDevice("Bearer "+Merchant.merchantToken,body)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(resp->{
@@ -269,7 +307,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     }
 
     @NonNull
-    private EnrollDeviceRequest collectDataEnroll( User user, String pin, boolean isUseFinger){
+    private EnrollDeviceRequest collectDataEnroll(User user, String pin, boolean isUseFinger){
         Sim sim = new Sim(ctx);
         Device device = new Device(ctx);
         Connection c = new Connection(ctx);
@@ -278,7 +316,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         Contact contact = new Contact(ctx);
         List<EnrollDeviceRequest.Contact> contactBody = new ArrayList<>();
         for(Contact ct: contact.getContacts()){
-            EnrollDeviceRequest.Contact ctBody = new EnrollDeviceRequest.Contact(ct.getName(),ct.getPhoneNumber());
+            EnrollDeviceRequest.Contact ctBody = new EnrollDeviceRequest.Contact(ct.getName(),ct.getPhoneNumber().get(0));
             contactBody.add(ctBody);
         }
         EnrollDeviceRequest.Location locationBody = new EnrollDeviceRequest.Location(geo.getLatitude(),geo.getLongitude());
@@ -294,12 +332,12 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         return request;
     }
 
-    private ValidateDeviceRequest collectDataValidate(TrustedDeviceListener<ValidateStatus> listener){
+    private ValidateDeviceRequest collectDataValidate(){
         String userId = Storage.readDataLocal(ctx,Fazpass.USER_ID);
         String meta = Storage.readDataLocal(ctx,Fazpass.META);
         String key = Storage.readDataLocal(ctx,Fazpass.PUBLIC_KEY);
         if(userId.equals("")||meta.equals("")||key.equals("")){
-            listener.onFailure(Error.localDataMissing());
+            return null;
         }
         Sim sim = new Sim(ctx);
         Device device = new Device(ctx);
@@ -308,7 +346,7 @@ public class Fazpass extends TrustedDevice implements Behaviour {
 
         List<ValidateDeviceRequest.Contact> contactBody = new ArrayList<>();
         for(Contact ct: contact.getContacts()){
-            ValidateDeviceRequest.Contact ctBody = new ValidateDeviceRequest.Contact(ct.getName(),ct.getPhoneNumber());
+            ValidateDeviceRequest.Contact ctBody = new ValidateDeviceRequest.Contact(ct.getName(),ct.getPhoneNumber().get(0));
             contactBody.add(ctBody);
         }
         ValidateDeviceRequest.Location locationBody = new ValidateDeviceRequest.Location(geo.getLatitude(),geo.getLongitude());
@@ -319,6 +357,15 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         }
         ValidateDeviceRequest body = new ValidateDeviceRequest(userId, device.getDevice(), ctx.getPackageName(),
                 meta, key, geo.getTimezone(), contactBody, locationBody, simBody);
+        return body;
+    }
+
+    private RemoveDeviceRequest collectDataRemove(){
+        String userId = Storage.readDataLocal(ctx,USER_ID);
+        Device device = new Device(ctx);
+        GeoLocation geo = new GeoLocation(ctx);
+        RemoveDeviceRequest.Location l = new RemoveDeviceRequest.Location(geo.getLatitude(), geo.getLongitude());
+        RemoveDeviceRequest body = new RemoveDeviceRequest(userId,ctx.getPackageName(),device.getDevice(),l,geo.getTimezone());
         return body;
     }
 }

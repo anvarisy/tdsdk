@@ -33,10 +33,12 @@ public class SplashActivity extends AppCompatActivity {
                     @Override public void onPermissionsChecked(MultiplePermissionsReport report) {
                         Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                     @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                         Intent intent = new Intent(SplashActivity.this,MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 }).check();
     }

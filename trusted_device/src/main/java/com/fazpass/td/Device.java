@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Observable;
 
 
 class Device {
-    private Context context;
+    private final Context context;
     private String device;
     private String notificationToken;
 

@@ -1,8 +1,8 @@
 package com.fazpass.td;
 
 public class ValidateStatus {
-    private boolean status;
-    private Confidence confidenceRate;
+    private final boolean status;
+    private final Confidence confidenceRate;
 
     public ValidateStatus(boolean status, Confidence confidenceRate) {
         this.status = status;
