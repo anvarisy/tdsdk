@@ -1,7 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'com.google.gms.google-services'
+    id 'maven-publish'
 }
+group = 'me.anvarisy.samplesdk'
+version = '0.0.1'
 
 android {
     compileSdk 32
@@ -24,6 +27,24 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+def getVersionName = { ->
+    return "0.0.1" // Replace with version Name
+}
+
+def getArtifactId = { ->
+    return "sdk" // Replace with library name ID
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'me.anvarisy'
+            artifactId = getArtifactId
+            version = getVersionName
+        }
     }
 }
 
