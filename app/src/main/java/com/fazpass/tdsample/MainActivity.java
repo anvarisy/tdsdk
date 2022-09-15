@@ -3,19 +3,12 @@ package com.fazpass.tdsample;
 import static com.fazpass.tdsample.Cons.merchantKey;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
-import com.fazpass.td.EnrollStatus;
 import com.fazpass.td.Fazpass;
 import com.fazpass.td.TD_MODE;
-import com.fazpass.td.TrustedDeviceListener;
-import com.fazpass.td.User;
 import com.fazpass.tdsample.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,15 +21,17 @@ public class MainActivity extends AppCompatActivity {
         String email = Storage.readDataLocal(this, "email");
         String phone = Storage.readDataLocal(this, "phone");
         Cons c = new Cons(this);
+        c.closeDialog();
         binding.btnLogin.setOnClickListener(v->{
             if(email.equals("")&&phone.equals("")){
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 return;
             }
-            c.showDialog();
+            c.showDialog(false);
              Fazpass.initialize(this, merchantKey, TD_MODE.STAGING)
                 .check(email,phone).subscribe(f->{
+                    c.closeDialog();
                     switch (f.status){
                         case KEY_IS_MATCH:
                             Intent intent = new Intent(this, HomeActivity.class);
@@ -48,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
                             break;
                     }
                 },err->{
-                         Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                    c.closeDialog();
+                    Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
                 });
         });
         binding.btnRegister.setOnClickListener(v->{

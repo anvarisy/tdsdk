@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import io.reactivex.rxjava3.core.Observable;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 
 class Sim {
     private String serialNumber;
@@ -59,8 +61,9 @@ class Sim {
             PhoneAccountHandle phoneAccountHandle;
             List<Sim> sims = new ArrayList<>();
             SubscriptionManager subscriptionManager = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
-            if(PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) &&
-            PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS)){
+            boolean isPermit = PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) &&
+                    PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS);
+            if(isPermit){
                 List<SubscriptionInfo> subscriptionInfos = subscriptionManager.getActiveSubscriptionInfoList();
                 TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
                 tm2 = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
@@ -81,7 +84,7 @@ class Sim {
                     phoneAccountHandle = phoneAccounts.next();
                     String simSerial = "";
                     try {
-                        simSerial = phoneAccountHandle.getId().substring(0,19);
+                        simSerial = phoneAccountHandle.getId();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -101,8 +104,9 @@ class Sim {
         return Observable.create(subscriber->{
             List<Sim> sims = new ArrayList<>();
             SubscriptionManager subscriptionManager = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
-            if(PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) &&
-            PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS)){
+            boolean isPermit = PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) &&
+                    PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS);
+            if(isPermit){
                 List<SubscriptionInfo> subscriptionInfos = subscriptionManager.getActiveSubscriptionInfoList();
                 for (SubscriptionInfo subscriptionInfo : subscriptionInfos) {
                     int slotIndex = subscriptionInfo.getSimSlotIndex();

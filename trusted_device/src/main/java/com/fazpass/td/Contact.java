@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.sentry.Sentry;
 
 public class Contact {
     private Context context;
@@ -33,8 +34,8 @@ public class Contact {
     private Observable<List<Contact>> readContacts(){
         return Observable.create(subscriber->{
             List<Contact> contacts = new ArrayList<>();
-            if(PackageManager.PERMISSION_GRANTED == ContextCompat
-                    .checkSelfPermission(context, Manifest.permission.READ_CONTACTS)){
+            boolean isPermit = PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS);
+            if(isPermit){
                 ContentResolver cr =context.getContentResolver();
                 Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
                 while (cur.moveToNext()) {
@@ -53,8 +54,6 @@ public class Contact {
 
                         }
                         pCur.close();
-                    }else{
-                        phones.add("");
                     }
                     Contact contact = new Contact(name, phones);
                     contacts.add(contact);

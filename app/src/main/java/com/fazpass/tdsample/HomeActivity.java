@@ -37,7 +37,7 @@ public class HomeActivity extends AppCompatActivity {
                           "Is Trusted: \t \t"+Boolean.parseBoolean(Storage.readDataLocal(this,"status"));
         binding.tvContent.setText(content);
         binding.btnLogout.setOnClickListener(v -> {
-            c.showDialog();
+            c.showDialog(false);
             Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(
                     Storage.readDataLocal(this,"email"),Storage.readDataLocal(this,"phone")
             ).subscribe(f->{
@@ -57,14 +57,21 @@ public class HomeActivity extends AppCompatActivity {
                             Toast.makeText(HomeActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+                    return;
                 }
+                Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
             },err->{
+                Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
                 c.closeDialog();
             });
         });
 
      binding.btnValidate.setOnClickListener(v->{
-         c.showDialog();
+         if(!Boolean.parseBoolean(Storage.readDataLocal(this,"status"))){
+             Toast.makeText(this, "You are not trusted", Toast.LENGTH_SHORT).show();
+             return;
+         }
+         c.showDialog(false);
          LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
          View viewInput = inflater.inflate(R.layout.dialog_pin,null,false);
          EditText pin = viewInput.findViewById(R.id.edtInputPin);
@@ -82,7 +89,7 @@ public class HomeActivity extends AppCompatActivity {
                              dialog.show();
                              confirm.setOnClickListener(views->{
                                  dialog.dismiss();
-                                 c.showDialog();
+                                 c.showDialog(false);
                                  f.validateUser(pin.getText().toString(), new TrustedDeviceListener<ValidateStatus>() {
                                      @Override
                                      public void onSuccess(ValidateStatus result) {
@@ -136,6 +143,8 @@ public class HomeActivity extends AppCompatActivity {
                                  }
                              });
                          }
+                     }else{
+                         Toast.makeText(this, String.valueOf(f.status), Toast.LENGTH_SHORT).show();
                      }
                  },err->{
                      c.closeDialog();

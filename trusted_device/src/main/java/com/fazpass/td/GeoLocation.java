@@ -48,6 +48,8 @@ class GeoLocation extends Service implements LocationListener {
     }
 
     void readLocation() {
+        boolean isPermit = PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)&&
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
         try {
             locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
 
@@ -63,8 +65,7 @@ class GeoLocation extends Service implements LocationListener {
             } else {
                 this.canGetLocation = true;
                 if (isNetworkEnabled) {
-                    if(PackageManager.PERMISSION_GRANTED == ContextCompat
-                            .checkSelfPermission(context, Manifest.permission.READ_CONTACTS)) {
+                    if(isPermit) {
                         locationManager.requestLocationUpdates(
                                 LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES,
@@ -84,8 +85,7 @@ class GeoLocation extends Service implements LocationListener {
                     if (location == null) {
                         //check the network permission
                         assert locationManager != null;
-                        if(PackageManager.PERMISSION_GRANTED == ContextCompat
-                                .checkSelfPermission(context, Manifest.permission.READ_CONTACTS)){
+                        if(isPermit){
                             locationManager.requestLocationUpdates(
                                     LocationManager.GPS_PROVIDER,
                                     MIN_TIME_BW_UPDATES,
@@ -104,8 +104,8 @@ class GeoLocation extends Service implements LocationListener {
 
                     }
                 }
-            }
 
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

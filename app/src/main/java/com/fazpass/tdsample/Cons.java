@@ -18,9 +18,11 @@ public class Cons {
                 "Please wait");
         progressDialog.setImageLocation(ResourcesCompat.getDrawable(context.getResources(), R.drawable.fazpass, null));
         progressDialog.setLayoutColor(ResourcesCompat.getColor(context.getResources(),R.color.blue,null));
+
     }
 
-    public void showDialog(){
+    public void showDialog(boolean cancelAble){
+        progressDialog.setCancelable(cancelAble);
         progressDialog.show();
     }
 

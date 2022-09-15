@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
         ActivityRegisterBinding binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        Cons c = new Cons(this);
         binding.btnRegister.setOnClickListener(v->{
 
             if(binding.edtUserId.getText().toString().equals("")
@@ -42,16 +44,21 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, "PIN not match", Toast.LENGTH_SHORT).show();
                 return;
             }
-            phone = binding.edtUserId.getText().toString();
-            email = binding.edtUserEmail.getText().toString();
+            phone = binding.edtUserId.getText().toString().replaceAll(" ","");
+            email = binding.edtUserEmail.getText().toString().replaceAll(" ","");
+            c.showDialog(false);
             Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(email,phone)
                     .subscribe(f->{
+                        c.closeDialog();
                       if(f.status.equals(TD_STATUS.USER_NOT_FOUND)||f.status.equals(TD_STATUS.KEY_SERVER_NOT_FOUND)){
                           AlertDialog.Builder builder = new AlertDialog.Builder(this);
                           builder.setNeutralButton("NO", (dialogInterface, i) -> {
+                              dialogInterface.dismiss();
                               goHome(false);
                           });
-                          builder.setPositiveButton("YES BY FINGER", (dialogInterface, i) -> {
+                          builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
+                              dialogInterface.dismiss();
+                              c.showDialog(true);
                               f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
                                       binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
                                           @Override
@@ -61,13 +68,16 @@ public class RegisterActivity extends AppCompatActivity {
 
                                           @Override
                                           public void onFailure(Throwable err) {
+                                              c.closeDialog();
+                                              Log.e("ERR",err.getMessage());
                                               Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
                                           }
                                       });
                           });
 
-                          builder.setNegativeButton("YES BY PIN", (dialogInterface, i) -> {
-
+                          builder.setNegativeButton("PIN", (dialogInterface, i) -> {
+                              dialogInterface.dismiss();
+                              c.showDialog(false);
                               f.enrollDeviceByPin(new User(email, phone, "", "", ""),
                                       binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
                                           @Override
@@ -77,6 +87,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                                           @Override
                                           public void onFailure(Throwable err) {
+                                              c.closeDialog();
+                                              Log.e("ERR",err.getMessage());
                                               Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
                                           }
                                       });
@@ -86,9 +98,54 @@ public class RegisterActivity extends AppCompatActivity {
                                   .setTitle("TRUSTED DEVICE");
                           AlertDialog dialog = builder.create();
                           dialog.show();
+                      }else{
+                          AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                          builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
+                              dialogInterface.dismiss();
+                              c.showDialog(false);
+                              f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
+                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                          @Override
+                                          public void onSuccess(EnrollStatus result) {
+                                              goHome(true);
+                                          }
+
+                                          @Override
+                                          public void onFailure(Throwable err) {
+                                              c.closeDialog();
+                                              Log.e("ERR",err.getMessage());
+                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                          }
+                                      });
+                          });
+
+                          builder.setNegativeButton("PIN", (dialogInterface, i) -> {
+                              dialogInterface.dismiss();
+                              c.showDialog(false);
+                              f.enrollDeviceByPin(new User(email, phone, "", "", ""),
+                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                          @Override
+                                          public void onSuccess(EnrollStatus result) {
+                                              goHome(true);
+                                          }
+
+                                          @Override
+                                          public void onFailure(Throwable err) {
+                                              c.closeDialog();
+                                              Log.e("ERR",err.getMessage());
+                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                          }
+                                      });
+                          });
+                          builder.setCancelable(false);
+                          builder.setMessage("Choose what method do you like ?")
+                                  .setTitle("VERIFICATION METHOD");
+                          AlertDialog dialog = builder.create();
+                          dialog.show();
                       }
                     },err->{
-
+                        c.closeDialog();
+                        Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
             });
         });
     }

@@ -18,20 +18,19 @@ class Device {
 
     public Device(Context context) {
         this.context = context;
-        initialize();
+        initialize(context);
         readNotificationToken().subscribe(s->{
             this.notificationToken = s;
         });
     }
 
-    private void initialize(){
-        this.device = readMeta()+"-"+generateAppId();
+    private void initialize(Context context){
+        this.device = readMeta()+"-"+generateAppId(context);
     }
 
     @SuppressLint("HardwareIds")
-    private String generateAppId(){
-        String appId = Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        return appId;
+    private String generateAppId(Context context){
+        return Settings.Secure.getString(context.getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     private String readMeta(){

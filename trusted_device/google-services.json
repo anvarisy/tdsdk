@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "986691515340",
+    "project_id": "anvarisy-tech",
+    "storage_bucket": "anvarisy-tech.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986691515340:android:9d9c5b320cb0a226f76369",
+        "android_client_info": {
+          "package_name": "com.fazpass.td"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "986691515340-unf0e1djch5bijb3g0r74nrh25uijmbv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSdIDRMCyggTPFq5zQnwcw9lq2j1H0Zis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "986691515340-unf0e1djch5bijb3g0r74nrh25uijmbv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986691515340:android:fdaa96ac615bc5cff76369",
+        "android_client_info": {
+          "package_name": "com.fazpass.tdsample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "986691515340-unf0e1djch5bijb3g0r74nrh25uijmbv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSdIDRMCyggTPFq5zQnwcw9lq2j1H0Zis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "986691515340-unf0e1djch5bijb3g0r74nrh25uijmbv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

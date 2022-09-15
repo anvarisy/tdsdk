@@ -21,7 +21,4 @@ public interface UseCase {
     @POST("v1/trusted-device/remove")
     Observable<Response<RemoveDeviceResponse>> removeDevice(@Header("Authorization")String token, @Body RemoveDeviceRequest body);
 
-    @POST("v1/trusted-device/recover")
-    Observable<Response<RecoverAccountResponse>> recoverDevice(@Header("Authorization")String token, @Body RecoverAccountRequest body);
-
 }
