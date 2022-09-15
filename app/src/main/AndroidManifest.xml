@@ -15,13 +15,13 @@
         tools:targetApi="31">
         <activity
             android:name=".HomeActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -33,7 +33,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
+            android:exported="true"/>
 
         <meta-data
             android:name="LogcatWindowEntrance"
@@ -41,15 +41,6 @@
         <meta-data
             android:name="LogcatNotifyEntrance"
             android:value="true" />
-
-        <activity
-            android:name="com.hjq.logcat.LogcatActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="stateHidden"
-            tools:node="replace" />
     </application>
 
 </manifest>

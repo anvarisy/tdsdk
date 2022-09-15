@@ -22,14 +22,14 @@ Gradle
 As default this SDK used these permissions
 ```xml
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+<uses-permission android:name="android.permission.READ_CONTACTS" />
+<uses-permission android:name="android.permission. ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 ```
 So make sure you request all of these permission as a requirement.
 
@@ -38,13 +38,13 @@ Choose mode that u want to use ex: STAGING or PRODUCTION
 ```java
     Fazpass.initialize(Context, MERCHANT_KEY, TD_MODE.STAGING)
         .check("","").subscribe(f->{
-            switch(f.status){
-                case TD_STATUS.KEY_LOCALE_NOT_FOUND:
-                    //TODO
-                    break;
-                case TD_STATUS.KEY_IS_MATCH:
-                    break;
-            }
+        switch(f.status){
+        case TD_STATUS.KEY_LOCALE_NOT_FOUND:
+        //TODO
+        break;
+        case TD_STATUS.KEY_IS_MATCH:
+        break;
+        }
         },err->{
 
         });
@@ -67,4 +67,5 @@ We have some function after you call check method
 | -------------             |:-------------:    |
 | enrollDeviceByFinger      | registered new device with finger as a authentication     |
 | enrollDeviceByPin         | registered new device with pin as a authentication     |
-| zebra stripes             | are neat          |
+| validateUser              | validating data user between local and server          |
+| removeDevice              | remove trusted status from this app inside this device       |
