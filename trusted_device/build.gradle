@@ -31,19 +31,20 @@ android {
 }
 
 def getVersionName = { ->
-    return "0.0.1" // Replace with version Name
+    return "0.0.3" // Replace with version Name
 }
 
 def getArtifactId = { ->
-    return "sdk" // Replace with library name ID
+    return "trusted_device" // Replace with library name ID
 }
 
 publishing {
     publications {
         release(MavenPublication) {
             groupId = 'me.anvarisy'
-            artifactId = getArtifactId
-            version = getVersionName
+            artifactId = getArtifactId()
+            version = getVersionName()
+            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
         }
     }
 }
