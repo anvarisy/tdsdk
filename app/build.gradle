@@ -56,4 +56,5 @@ dependencies {
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
     debugImplementation 'com.github.getActivity:Logcat:10.6'
     implementation project(path: ':trusted_device')
+//    implementation 'com.github.anvarisy:tdsdk:0.1.3'
 }

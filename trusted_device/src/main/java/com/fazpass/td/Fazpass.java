@@ -19,6 +19,8 @@ import com.fazpass.td.internet.response.CheckUserResponse;
 import com.fazpass.td.internet.response.EnrollDeviceResponse;
 import com.fazpass.td.internet.response.RemoveDeviceResponse;
 import com.fazpass.td.internet.response.ValidateDeviceResponse;
+import com.framgia.android.emulator.EmulatorDetector;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -36,6 +38,15 @@ public class Fazpass extends TrustedDevice implements Behaviour {
 
     public static TrustedDevice initialize(Context context, String merchantToken, TD_MODE mode){
         Device device = new Device(context);
+        EmulatorDetector.with(context)
+//                .setCheckTelephony(true)
+                .addPackageName("com.browserstack")
+                .setDebug(true)
+                .detect(isEmulator -> {
+                    if(isEmulator){
+                        throw new SecurityException("Device rooted or is an emulator lib stage");
+                    }
+                });
         SentryAndroid.init(context, options -> {
             options.setDsn("https://1f85de8be5544aaab7847e377b4c6227@o1173329.ingest.sentry.io/6720667");
             options.setTracesSampleRate(1.0);
@@ -92,51 +103,8 @@ public class Fazpass extends TrustedDevice implements Behaviour {
     }
 
     @Override
-    public Observable<Fazpass> check(@NonNull String email, @NonNull String phone) {
-        if(email.equals("") && phone.equals("")){
-            throw new NullPointerException("email or phone cannot be empty");
-        }
-        String packageName = ctx.getPackageName();
-        Device device = new Device(ctx);
-        GeoLocation location = new GeoLocation(ctx);
-        CheckUserRequest.Location locationDetail = new CheckUserRequest.Location(location.getLatitude(),location.getLongitude());
-        CheckUserRequest body = new CheckUserRequest(email,phone, packageName,device.getDevice(), location.getTimezone(),locationDetail);
-        Helper.sentryMessage("CHECK", body);
-        return Observable.create(subscriber->{
-            UseCase u = Roaming.start();
-            u.startService("Bearer "+Merchant.merchantToken,body)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            resp->{
-                                String key = Storage.readDataLocal(ctx, PRIVATE_KEY);
-                                if(!resp.getStatus()){
-                                    subscriber.onNext(new Fazpass(ctx, TD_STATUS.USER_NOT_FOUND, null));
-                                    subscriber.onComplete();
-                                }else{
-                                    if(resp.getData().getApps().getCurrent().getKey().equals("")){
-                                        subscriber.onNext(new Fazpass(ctx, TD_STATUS.KEY_SERVER_NOT_FOUND, null));
-                                        subscriber.onComplete();
-                                    }else{
-                                        if(key.equals("")){
-                                            removeDevice(resp.getData().getUser().getId(),resp.getData()).subscribe(f->{
-                                                subscriber.onNext(f);
-                                                subscriber.onComplete();
-                                            });
-                                        }else{
-                                            subscriber.onNext(new Fazpass(ctx, TD_STATUS.KEY_READY_TO_COMPARE, resp.getData()));
-                                            subscriber.onComplete();
-                                        }
-                                    }
-
-                                }
-
-                            },err->{
-                                subscriber.onError(err);
-                                Sentry.captureException(err);
-                            }
-                    );
-        });
+    public void check(@NonNull String email, @NonNull String phone, TrustedDeviceListener<Fazpass> listener) {
+      checking(email,phone).subscribe(listener::onSuccess, listener::onFailure);
     }
 
     @Override
@@ -205,6 +173,53 @@ public class Fazpass extends TrustedDevice implements Behaviour {
         }, err->{
             listener.onFailure(err);
             Sentry.captureException(err);
+        });
+    }
+
+    private Observable<Fazpass> checking(String email, String phone){
+        if(email.equals("") && phone.equals("")){
+            throw new NullPointerException("email or phone cannot be empty");
+        }
+        String packageName = ctx.getPackageName();
+        Device device = new Device(ctx);
+        GeoLocation location = new GeoLocation(ctx);
+        CheckUserRequest.Location locationDetail = new CheckUserRequest.Location(location.getLatitude(),location.getLongitude());
+        CheckUserRequest body = new CheckUserRequest(email,phone, packageName,device.getDevice(), location.getTimezone(),locationDetail);
+        Helper.sentryMessage("CHECK", body);
+        return Observable.create(subscriber->{
+            UseCase u = Roaming.start();
+            u.startService("Bearer "+Merchant.merchantToken,body)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            resp->{
+                                String key = Storage.readDataLocal(ctx, PRIVATE_KEY);
+                                if(!resp.getStatus()){
+                                    subscriber.onNext(new Fazpass(ctx, TD_STATUS.USER_NOT_FOUND, null));
+                                    subscriber.onComplete();
+                                }else{
+                                    if(resp.getData().getApps().getCurrent().getKey().equals("")){
+                                        subscriber.onNext(new Fazpass(ctx, TD_STATUS.KEY_SERVER_NOT_FOUND, null));
+                                        subscriber.onComplete();
+                                    }else{
+                                        if(key.equals("")){
+                                            removeDevice(resp.getData().getUser().getId(),resp.getData()).subscribe(f->{
+                                                subscriber.onNext(f);
+                                                subscriber.onComplete();
+                                            });
+                                        }else{
+                                            subscriber.onNext(new Fazpass(ctx, TD_STATUS.KEY_READY_TO_COMPARE, resp.getData()));
+                                            subscriber.onComplete();
+                                        }
+                                    }
+
+                                }
+
+                            },err->{
+                                subscriber.onError(err);
+                                Sentry.captureException(err);
+                            }
+                    );
         });
     }
 

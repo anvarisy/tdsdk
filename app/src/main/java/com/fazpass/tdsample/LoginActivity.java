@@ -29,59 +29,64 @@ public class LoginActivity extends AppCompatActivity {
         ActivityLoginBinding binding = ActivityLoginBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        Cons c = new Cons(this);
-        c.closeDialog();
         binding.btnLoginPage.setOnClickListener(v -> {
             if(binding.edtUserId.getText().toString().equals("")){
                 Toast.makeText(this, "Please fill user id field !", Toast.LENGTH_SHORT).show();
                 return;
             }
-            c.showDialog(false);
             if(isEmailValid(binding.edtUserId.getText().toString())){
                 email = binding.edtUserId.getText().toString();
             }else{
                 phone = binding.edtUserId.getText().toString();
             }
-            Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(email,phone).subscribe(f->{
-                c.closeDialog();
-                switch (f.status){
-                    case KEY_IS_MATCH:
-                        goHome(true);
-                        break;
-                    case USER_NOT_FOUND:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setPositiveButton("YES", (dialogInterface, i) -> {
-                            Intent intent = new Intent(this, RegisterActivity.class);
-                            startActivity(intent);
+            Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(email, phone, new TrustedDeviceListener<Fazpass>() {
+                @Override
+                public void onSuccess(Fazpass f) {
+                    switch (f.status){
+                        case KEY_IS_MATCH:
+                            goHome(true);
+                            break;
+                        case USER_NOT_FOUND:
+                            /*AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                            builder.setPositiveButton("YES", (dialogInterface, i) -> {
+                                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                                startActivity(intent);
 
-                        });
-                        builder.setNegativeButton("NO", (dialogInterface, i) -> {
-                           dialogInterface.dismiss();
-                        });
-                        builder.setCancelable(false);
-                        builder.setMessage("Do you want to register ?")
-                                .setTitle("Account Not Found");
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                        break;
-                    default:
-                        builder = new AlertDialog.Builder(this);
-                        builder.setPositiveButton("YES", (dialogInterface, i) -> {
-                            Intent intent = new Intent(this, RegisterActivity.class);
-                            startActivity(intent);
-                        });
-                        builder.setNegativeButton("NO", (dialogInterface, i) -> {
-                            goHome(false);
-                        });
-                        builder.setCancelable(false);
-                        builder.setMessage("Do you want activating trusted device ?")
-                                .setTitle("TRUSTED DEVICE");
-                        dialog = builder.create();
-                        dialog.show();
-                        break;
+                            });
+                            builder.setNegativeButton("NO", (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                            });
+                            builder.setCancelable(false);
+                            builder.setMessage("Do you want to register ?")
+                                    .setTitle("Account Not Found");
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                            */
+                            Toast.makeText(LoginActivity.this, "USER NOT FOUND", Toast.LENGTH_SHORT).show();
+                            break;
+                        default:
+                            Toast.makeText(LoginActivity.this, String.valueOf(f.status), Toast.LENGTH_SHORT).show();
+                         /*   builder = new AlertDialog.Builder(LoginActivity.this);
+                            builder.setPositiveButton("YES", (dialogInterface, i) -> {
+                                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                                startActivity(intent);
+                            });
+                            builder.setNegativeButton("NO", (dialogInterface, i) -> {
+                                goHome(false);
+                            });
+                            builder.setCancelable(false);
+                            builder.setMessage("Do you want activating trusted device ?")
+                                    .setTitle("TRUSTED DEVICE");
+                            dialog = builder.create();
+                            dialog.show();*/
+                            break;
+                    }
                 }
-            },err->{
 
+                @Override
+                public void onFailure(Throwable err) {
+
+                }
             });
         });
     }

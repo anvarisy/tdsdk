@@ -47,106 +47,111 @@ public class RegisterActivity extends AppCompatActivity {
             phone = binding.edtUserId.getText().toString().replaceAll(" ","");
             email = binding.edtUserEmail.getText().toString().replaceAll(" ","");
             c.showDialog(false);
-            Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(email,phone)
-                    .subscribe(f->{
-                        c.closeDialog();
-                      if(f.status.equals(TD_STATUS.USER_NOT_FOUND)||f.status.equals(TD_STATUS.KEY_SERVER_NOT_FOUND)){
-                          AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                          builder.setNeutralButton("NO", (dialogInterface, i) -> {
-                              dialogInterface.dismiss();
-                              goHome(false);
-                          });
-                          builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
-                              dialogInterface.dismiss();
-                              c.showDialog(true);
-                              f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
-                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
-                                          @Override
-                                          public void onSuccess(EnrollStatus result) {
-                                                goHome(true);
-                                          }
+            Fazpass.initialize(this, merchantKey, TD_MODE.STAGING).check(email, phone, new TrustedDeviceListener<Fazpass>() {
+                @Override
+                public void onSuccess(Fazpass f) {
+                    c.closeDialog();
+                    if(f.status.equals(TD_STATUS.USER_NOT_FOUND)||f.status.equals(TD_STATUS.KEY_SERVER_NOT_FOUND)){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                        builder.setNeutralButton("NO", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            goHome(false);
+                        });
+                        builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            c.showDialog(true);
+                            f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
+                                    binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                        @Override
+                                        public void onSuccess(EnrollStatus result) {
+                                            goHome(true);
+                                        }
 
-                                          @Override
-                                          public void onFailure(Throwable err) {
-                                              c.closeDialog();
-                                              Log.e("ERR",err.getMessage());
-                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
-                                          }
-                                      });
-                          });
+                                        @Override
+                                        public void onFailure(Throwable err) {
+                                            c.closeDialog();
+                                            Log.e("ERR",err.getMessage());
+                                            Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        });
 
-                          builder.setNegativeButton("PIN", (dialogInterface, i) -> {
-                              dialogInterface.dismiss();
-                              c.showDialog(false);
-                              f.enrollDeviceByPin(new User(email, phone, "", "", ""),
-                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
-                                          @Override
-                                          public void onSuccess(EnrollStatus result) {
-                                              goHome(true);
-                                          }
+                        builder.setNegativeButton("PIN", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            c.showDialog(false);
+                            f.enrollDeviceByPin(new User(email, phone, "", "", ""),
+                                    binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                        @Override
+                                        public void onSuccess(EnrollStatus result) {
+                                            goHome(true);
+                                        }
 
-                                          @Override
-                                          public void onFailure(Throwable err) {
-                                              c.closeDialog();
-                                              Log.e("ERR",err.getMessage());
-                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
-                                          }
-                                      });
-                          });
-                          builder.setCancelable(false);
-                          builder.setMessage("Do you want activating trusted device ?")
-                                  .setTitle("TRUSTED DEVICE");
-                          AlertDialog dialog = builder.create();
-                          dialog.show();
-                      }else{
-                          AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                          builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
-                              dialogInterface.dismiss();
-                              c.showDialog(false);
-                              f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
-                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
-                                          @Override
-                                          public void onSuccess(EnrollStatus result) {
-                                              goHome(true);
-                                          }
+                                        @Override
+                                        public void onFailure(Throwable err) {
+                                            c.closeDialog();
+                                            Log.e("ERR",err.getMessage());
+                                            Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        });
+                        builder.setCancelable(false);
+                        builder.setMessage("Do you want activating trusted device ?")
+                                .setTitle("TRUSTED DEVICE");
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }else{
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                        builder.setPositiveButton("BIOMETRIC", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            c.showDialog(false);
+                            f.enrollDeviceByFinger(new User(email, phone, "", "", ""),
+                                    binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                        @Override
+                                        public void onSuccess(EnrollStatus result) {
+                                            goHome(true);
+                                        }
 
-                                          @Override
-                                          public void onFailure(Throwable err) {
-                                              c.closeDialog();
-                                              Log.e("ERR",err.getMessage());
-                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
-                                          }
-                                      });
-                          });
+                                        @Override
+                                        public void onFailure(Throwable err) {
+                                            c.closeDialog();
+                                            Log.e("ERR",err.getMessage());
+                                            Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        });
 
-                          builder.setNegativeButton("PIN", (dialogInterface, i) -> {
-                              dialogInterface.dismiss();
-                              c.showDialog(false);
-                              f.enrollDeviceByPin(new User(email, phone, "", "", ""),
-                                      binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
-                                          @Override
-                                          public void onSuccess(EnrollStatus result) {
-                                              goHome(true);
-                                          }
+                        builder.setNegativeButton("PIN", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            c.showDialog(false);
+                            f.enrollDeviceByPin(new User(email, phone, "", "", ""),
+                                    binding.edtUserPin.getText().toString(), new TrustedDeviceListener<EnrollStatus>() {
+                                        @Override
+                                        public void onSuccess(EnrollStatus result) {
+                                            goHome(true);
+                                        }
 
-                                          @Override
-                                          public void onFailure(Throwable err) {
-                                              c.closeDialog();
-                                              Log.e("ERR",err.getMessage());
-                                              Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
-                                          }
-                                      });
-                          });
-                          builder.setCancelable(false);
-                          builder.setMessage("Choose what method do you like ?")
-                                  .setTitle("VERIFICATION METHOD");
-                          AlertDialog dialog = builder.create();
-                          dialog.show();
-                      }
-                    },err->{
-                        c.closeDialog();
-                        Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                        @Override
+                                        public void onFailure(Throwable err) {
+                                            c.closeDialog();
+                                            Log.e("ERR",err.getMessage());
+                                            Toast.makeText(RegisterActivity.this, err.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        });
+                        builder.setCancelable(false);
+                        builder.setMessage("Choose what method do you like ?")
+                                .setTitle("VERIFICATION METHOD");
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable err) {
+
+                }
             });
+
         });
     }
 

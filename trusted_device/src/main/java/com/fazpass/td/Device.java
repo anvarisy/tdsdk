@@ -38,6 +38,7 @@ class Device {
         return meta;
     }
 
+
     boolean isEmulator() {
         return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || Build.FINGERPRINT.startsWith("generic")

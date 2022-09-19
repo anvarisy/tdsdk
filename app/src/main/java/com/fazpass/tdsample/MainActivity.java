@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 import com.fazpass.td.Fazpass;
 import com.fazpass.td.TD_MODE;
+import com.fazpass.td.TrustedDeviceListener;
 import com.fazpass.tdsample.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,21 +31,26 @@ public class MainActivity extends AppCompatActivity {
             }
             c.showDialog(false);
              Fazpass.initialize(this, merchantKey, TD_MODE.STAGING)
-                .check(email,phone).subscribe(f->{
-                    c.closeDialog();
-                    switch (f.status){
-                        case KEY_IS_MATCH:
-                            Intent intent = new Intent(this, HomeActivity.class);
-                            startActivity(intent);
-                            break;
-                        default:
-                            Intent loginIntent = new Intent(this, LoginActivity.class);
-                            startActivity(loginIntent);
-                            break;
+                .check(email, phone, new TrustedDeviceListener<Fazpass>() {
+                    @Override
+                    public void onSuccess(Fazpass result) {
+                        c.closeDialog();
+                        switch (result.status){
+                            case KEY_IS_MATCH:
+                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                break;
+                            default:
+                                Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                                startActivity(loginIntent);
+                                break;
+                        }
                     }
-                },err->{
-                    c.closeDialog();
-                    Toast.makeText(this, err.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    @Override
+                    public void onFailure(Throwable err) {
+
+                    }
                 });
         });
         binding.btnRegister.setOnClickListener(v->{
